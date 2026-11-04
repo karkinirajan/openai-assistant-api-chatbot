@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Chat | AI Assistant{% endblock %}
+{% block content %}
+<section class="chat">
+  <h1>Chat with Assistant</h1>
+  <div id="chatBox" class="chat-box" aria-live="polite">
+    {% for m in messages %}
+    <div class="{{ 'user' if m.sender == 'user' else 'assistant' }}-message">{{ m.text }}</div>
+    {% endfor %}
+  </div>
+  <form id="chatForm" class="chat-form" autocomplete="off"
+        data-url="{{ url_for('web.chat_post') }}" data-csrf="{{ csrf_token() }}"
+        data-pause-ms="{{ pause_ms }}" data-ms-per-word="{{ ms_per_word }}" data-max-typing-ms="{{ max_typing_ms }}">
+    <input type="text" id="user_query" name="user_query" placeholder="Ask the assistant..." maxlength="{{ max_chars }}" required autofocus />
+    <button class="button" type="submit">Send</button>
+  </form>
+</section>
+<script src="{{ url_for('static', filename='chat.js') }}" defer></script>
+{% endblock %}

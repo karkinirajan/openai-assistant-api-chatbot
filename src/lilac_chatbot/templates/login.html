@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block title %}Log in | AI Assistant{% endblock %}
+{% block content %}
+<form class="card" method="post" action="{{ url_for('web.login') }}">
+  <h1>Please log in</h1>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  {% if next %}<input type="hidden" name="next" value="{{ next }}" />{% endif %}
+  <label for="login">Username or email</label>
+  <input type="text" id="login" name="login" autocomplete="username" required autofocus />
+  <label for="password">Password</label>
+  <input type="password" id="password" name="password" autocomplete="current-password" required />
+  <button class="button" type="submit">Log in</button>
+  <p>No account yet? <a href="{{ url_for('web.signup') }}">Register</a></p>
+</form>
+{% endblock %}

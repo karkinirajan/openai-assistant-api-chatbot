@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero">
+  <h1>Chat with Jessica</h1>
+  <p>Questions about an order, a product or a delivery? Ask the Life in Lilac assistant.</p>
+  {% if user %}
+  <a class="button" href="{{ url_for('web.chat') }}">Chat with Assistant</a>
+  {% else %}
+  <a class="button" href="{{ url_for('web.login') }}">Log in to chat</a>
+  {% endif %}
+</section>
+{% endblock %}

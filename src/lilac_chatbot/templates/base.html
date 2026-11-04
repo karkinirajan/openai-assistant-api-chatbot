@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}AI Assistant{% endblock %}</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  </head>
+  <body>
+    <header class="nav">
+      <a class="brand" href="{{ url_for('web.index') }}">AI Assistant</a>
+      <nav>
+        {% if user %}
+        <a href="{{ url_for('web.chat') }}">Chat</a>
+        <a href="{{ url_for('web.profile') }}">Profile</a>
+        <form class="inline" method="post" action="{{ url_for('web.logout') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+          <button class="link" type="submit">Logout</button>
+        </form>
+        {% else %}
+        <a href="{{ url_for('web.login') }}">Login</a>
+        <a href="{{ url_for('web.signup') }}">Signup</a>
+        {% endif %}
+      </nav>
+    </header>
+    <main>
+      {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+      <p class="flash {{ category }}" role="alert">{{ message }}</p>
+      {% endfor %}
+      {% endwith %}
+      {% block content %}{% endblock %}
+    </main>
+    <footer>© 2024 AI Assistant</footer>
+  </body>
+</html>

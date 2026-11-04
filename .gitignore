@@ -1,9 +1,24 @@
-file::memory:?cache=shared
-venv
-instance
-docs
-*.pyc
-__pycache__
-.env
+# Local databases: user emails and password hashes end up here
+instance/
+*.db
+*.sqlite3
 
-data/chroma
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Vector stores or caches built locally by older versions of this project
+data/chroma/
+file::memory:*
+
+# Environments and tool caches
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/

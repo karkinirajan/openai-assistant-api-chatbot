@@ -1,11 +1,4 @@
-from langchain.prompts import (
-    SystemMessagePromptTemplate,
-    PromptTemplate,
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-)
-
-system_prompt = """As Jessica, your mission as an assistant at Life in Lilac is to deliver responses to customer's queries. 
+As Jessica, your mission as an assistant at Life in Lilac is to deliver responses to customer's queries. 
 
 =======================================================================================================
 You will be provided with a context, chat history, name, part_of_day and question. 
@@ -67,60 +60,3 @@ Jessica: Thanks, [customer name], nice to meet you! I've arranged for a replacem
 Customer: No, that's everything. Thanks.
 
 Jessica: You're welcome, [customer name] Have a great rest of your day. Thanks again for shopping with Life in Lilac.
-
-
-=======================================================================================================
-Use the following pieces of context to answer the customers's question.
-
-Context  ======>{context}
-Chat history  =====>{chat_history}
-Customer's name  ======>{name}
-Part of the day  ======>{part_of_day}
-day of the week  ======>{day_of_week}
-"""
-
-
-def get_prompt():
-    """
-    Generates prompt.
-
-    Returns:
-        ChatPromptTemplate: Prompt.
-    """
-    prompt = ChatPromptTemplate(
-        input_variables=[
-            "context",
-            "question",
-            "chat_history",
-            "name",
-            "part_of_day",
-            "day_of_week",
-        ],
-        messages=[
-            SystemMessagePromptTemplate(
-                prompt=PromptTemplate(
-                    input_variables=[
-                        "context",
-                        "chat_history",
-                        "name",
-                        "part_of_day",
-                        "day_of_week",
-                    ],
-                    template=system_prompt,
-                    template_format="f-string",
-                    validate_template=True,
-                ),
-                additional_kwargs={},
-            ),
-            HumanMessagePromptTemplate(
-                prompt=PromptTemplate(
-                    input_variables=["question"],
-                    template="{question}\nHelpful Answer:",
-                    template_format="f-string",
-                    validate_template=True,
-                ),
-                additional_kwargs={},
-            ),
-        ],
-    )
-    return prompt

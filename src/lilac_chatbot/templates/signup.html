@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Sign up | AI Assistant{% endblock %}
+{% block content %}
+<form class="card" method="post" action="{{ url_for('web.signup') }}">
+  <h1>Sign up</h1>
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+  <label for="email">Email</label>
+  <input type="email" id="email" name="email" value="{{ form.get('email', '') }}" autocomplete="email" required />
+  <label for="first_name">First name</label>
+  <input type="text" id="first_name" name="first_name" value="{{ form.get('first_name', '') }}" autocomplete="given-name" required />
+  <label for="last_name">Last name</label>
+  <input type="text" id="last_name" name="last_name" value="{{ form.get('last_name', '') }}" autocomplete="family-name" required />
+  <label for="username">Username</label>
+  <input type="text" id="username" name="username" value="{{ form.get('username', '') }}" autocomplete="username" required />
+  <label for="password">Password (10 characters or more)</label>
+  <input type="password" id="password" name="password" minlength="10" autocomplete="new-password" required />
+  <button class="button" type="submit">Register</button>
+</form>
+{% endblock %}
