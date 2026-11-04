@@ -182,3 +182,22 @@ def test_a_blank_answer_is_an_error(assistant, openai_fake):
     openai_fake.answers = ["   \n"]
     with pytest.raises(AssistantError, match="no text"):
         ask(assistant)
+
+
+def test_a_reply_is_cleaned_of_control_and_format_characters_but_keeps_its_layout():
+    """A reply is stored and later printed by `replacements`; an ESC could drive an operator's terminal."""
+    raw = structured("List:\n1. one\t(a)\x1b[31m red\x1b[0m‮evil​ done \U0001f468‍\U0001f469")
+    answer, _, _ = parse_reply(raw)
+    assert "\x1b" not in answer and "‮" not in answer and "​" not in answer
+    assert answer.startswith("List:\n1. one\t(a)[31m red[0mevil done") and "\U0001f468‍\U0001f469" in answer
+
+
+def test_text_that_is_not_json_is_cleaned_too():
+    answer, flag, _ = parse_reply("plain \x1b[2Jtext\x07")
+    assert (answer, flag) == ("plain [2Jtext", False)
+
+
+def test_clean_answer_edges():
+    from lilac_chatbot.assistant import clean_answer
+
+    assert clean_answer("  ok  ") == "ok" and clean_answer("\x00\x01\x7f") == ""

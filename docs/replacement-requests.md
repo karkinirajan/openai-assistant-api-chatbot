@@ -15,6 +15,8 @@ never used it.
 * The customer sees `answer` only. The flag and the order id are saved with the assistant's message.
 * A reply that is valid JSON of another shape, or not JSON at all, is shown as plain text with the flag off. The
   flag is read strictly: the text `"yes"` or the number `1` does not count as true.
+* A reply is stored without control and format characters, and `replacements` filters them again when it prints,
+  because the text comes from a model that a customer can steer and is shown on an operator's terminal.
 * `uv run lilac-chatbot replacements` lists the flagged replies (time, username, order id, the start of the reply)
   and ends with a count by month.
 

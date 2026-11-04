@@ -58,7 +58,7 @@ Rewriting the 6-commit history with `git filter-repo` is possible after rotation
 | `templates/*` (6) | `src/lilac_chatbot/templates/` rewritten without inline code or CDNs; `static/style.css` (light and dark), `static/chat.js` |
 | `requirements.txt` (139 lines) | `pyproject.toml` + `uv.lock` (Python 3.13; 7 direct dependencies) |
 | `README.md` | rewritten |
-| (new) | `.env.example`, `.gitignore`, `Dockerfile`, `.dockerignore`, `.github/workflows/ci.yml`, `VERSIONS.md`, `docs/` (2 pages), 178 tests |
+| (new) | `.env.example`, `.gitignore`, `Dockerfile`, `.dockerignore`, `.github/workflows/ci.yml`, `VERSIONS.md`, `docs/` (2 pages), 183 tests |
 
 ### Behaviour that differs from the first version
 
@@ -73,6 +73,10 @@ Rewriting the 6-commit history with `git filter-repo` is possible after rotation
 * The reply is requested as a structured output. The customer sees `answer`; the flag and the order id are stored
   with the message. A reply that is not that JSON is shown as plain text instead of causing an error. The flag is
   read strictly (`"yes"` or `1` is not `true`).
+* Replies are stored without control and format characters (line breaks, tabs and emoji joiners are kept). An
+  automated security review of the first commit found that `replacements` printed the start of a reply to the
+  terminal as it was, so an ESC sequence written by the model (which a customer can steer) would have reached an
+  operator's terminal. The reply is now cleaned when it is stored and again when it is printed.
 * New: `lilac-chatbot replacements` lists the flagged replies and counts them by month. It is a work list: the
   persona's promise of a replacement still has nobody behind it.
 * The chat page starts the request at once and runs the 10-second pause alongside it. The brief's per-word typing
@@ -95,8 +99,8 @@ archived, or the shared part moved into a package.**
 
 | Check | Result |
 |---|---|
-| `pytest -q -W error --cov` | 178 passed (warnings are errors); 98 % line and branch coverage |
-| mutation check | 46 defects reintroduced one at a time (no CSRF check, a conversation shared between customers, an open redirect, a password stored in clear, no hash check for unknown accounts, raw OpenAI error text to the user, the Shopify token in the URL, customers requested from Shopify, the flag never stored, lax parsing of the flag, the structured format not requested, a non-JSON answer raising an error again, the weekday off by one, the last name sent to OpenAI, the report listing unflagged replies, ...): the suite failed for all 46; files restored afterwards |
+| `pytest -q -W error --cov` | 183 passed (warnings are errors); 98 % line and branch coverage |
+| mutation check | 49 defects reintroduced one at a time (no CSRF check, a conversation shared between customers, an open redirect, a password stored in clear, no hash check for unknown accounts, raw OpenAI error text to the user, the Shopify token in the URL, customers requested from Shopify, the flag never stored, lax parsing of the flag, the structured format not requested, a non-JSON answer raising an error again, the weekday off by one, the last name sent to OpenAI, the report listing unflagged replies, ...; the three that undo the terminal-escape fix included): the suite failed for all 49; files restored afterwards |
 | `ruff check`, `ruff format --check` | pass (rules `E F I B UP SIM S BLE RUF`) |
 | the app under `gunicorn` and the CLI as separate processes against a local fake OpenAI over HTTP | `init-knowledge` (with a file, and refused with nothing to upload), sign-up and log-in of two customers, separate conversations, no history shown across customers, the structured format and the `file_search` tool requested, the input equal to the customer's words, first name and weekday in the instructions, no last name sent, hashed customer id, a flagged request through to `replacements`, **no plaintext password and no API key in the database or logs** |
 | real browser (Chromium via Playwright): light and dark, 375/768/1280 px | the same templates and styles as in the sibling; the full check was run again against this app: all pages and chat states, no horizontal overflow, text contrast at least 4.5:1 and links 6.45:1 / 8.54:1, native focus rings, chat box focused on arrival |

@@ -77,3 +77,10 @@ def test_a_name_is_cleaned_before_it_enters_a_prompt():
 
 def test_an_empty_name_falls_back():
     assert "======>unknown" in persona.instructions(" \n ", datetime(2026, 11, 4, 20))
+
+
+def test_one_line_is_safe_to_print():
+    nasty = "first\nsecond\t\x1b[31mred\x1b[0m‮evil​ end " + "x" * 100
+    line = persona.one_line(nasty, 40)
+    assert "\n" not in line and "\t" not in line and "\x1b" not in line and "‮" not in line
+    assert line.startswith("first second [31mred[0mevil end") and len(line) <= 40

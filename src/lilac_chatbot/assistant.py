@@ -64,6 +64,16 @@ def _describe(exc: openai.OpenAIError) -> str:
     return type(exc).__name__ + (f", HTTP {status}" if status else "")
 
 
+# Kept when text is cleaned: a reply has line breaks and tabs, and U+200D joins the parts of an emoji
+_KEEP = frozenset("\n\t\u200d")
+
+
+def clean_answer(text: str) -> str:
+    """A reply as it may be stored: no control or format characters (an ESC would drive a terminal, a
+    right-to-left override would reorder what a person reads), except line breaks, tabs and emoji joiners."""
+    return "".join(c for c in text if c in _KEEP or not unicodedata.category(c).startswith("C")).strip()
+
+
 def clean_order_id(value: str) -> str:
     """An order id as it may be stored and shown to staff: one line, no control characters, bounded."""
     kept = "".join(c for c in value if not unicodedata.category(c).startswith("C"))
@@ -76,8 +86,8 @@ def parse_reply(raw: str) -> tuple[str, bool, str]:
         parsed = SupportReply.model_validate_json(raw)
     except ValidationError:
         logger.warning("OpenAI answered with text that is not the requested JSON; showing it as it is")
-        return raw.strip(), False, ""
-    return parsed.answer.strip(), parsed.is_order, clean_order_id(parsed.order_id)
+        return clean_answer(raw), False, ""
+    return clean_answer(parsed.answer), parsed.is_order, clean_order_id(parsed.order_id)
 
 
 class SupportAssistant:

@@ -194,3 +194,23 @@ def test_replacements_lists_the_flagged_replies_and_counts_them_by_month(
 def test_the_persona_ships_with_the_package():
     data = Path(cli.__file__).parent / "data"
     assert "Jessica" in (data / "persona.md").read_text()
+
+
+def test_replacements_never_prints_control_characters_even_from_a_hand_edited_database(
+    app, monkeypatch, env, capsys
+):
+    client = app.test_client()
+    sign_in(client, "alice")
+    post_chat(client, "Please replace order #1234")
+    with app.app_context():
+        message = db.session.scalars(db.select(ChatMessage).where(ChatMessage.sender == "assistant")).one()
+        message.is_order = True
+        message.text = (
+            "\x1b[2J\x1b]0;owned\x07Hi\u202e\nsecond line"  # stored by some other route than the app
+        )
+        db.session.commit()
+    apply_env(monkeypatch, env)
+    assert cli.main(["replacements"]) == 0
+    out = capsys.readouterr().out
+    assert "\x1b" not in out and "\x07" not in out and "\u202e" not in out
+    assert out.splitlines()[0].endswith("[2J]0;ownedHi second line") and len(out.splitlines()) == 2

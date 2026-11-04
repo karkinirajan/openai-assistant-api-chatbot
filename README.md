@@ -30,6 +30,7 @@ More detail: [The knowledge base](docs/knowledge-base.md) and [Replacement reque
 * The persona is told, on every request, the customer's first name, the part of the day and the day of the week
   (it uses the last for its "ships tomorrow, or Monday after Friday and Saturday" rule).
 * Replies are requested as a structured output; text that still is not that JSON is shown as plain text.
+  Replies are stored without control and format characters (line breaks, tabs and emoji joiners are kept).
 * `lilac-chatbot replacements` lists the replies in which the assistant flagged a replacement or order request,
   and counts them by month.
 * `lilac-chatbot init-knowledge --shopify` uploads the shop's active products to a new vector store.
@@ -119,7 +120,7 @@ uv run pytest -q -W error --cov
 uv run ruff check . && uv run ruff format --check .
 ```
 
-178 tests, 98 % line and branch coverage. Tests use an in-process fake OpenAI (`tests/fake_openai.py`) and a fake
+183 tests, 98 % line and branch coverage. Tests use an in-process fake OpenAI (`tests/fake_openai.py`) and a fake
 Shopify, so they need no key and no network. **No live OpenAI or Shopify call has been made with this code**: there
 was no key, only demo values. The app was also run under gunicorn against a local fake OpenAI over HTTP, and in a
 real browser (screenshots, keyboard focus, contrast and overflow checks in both themes).

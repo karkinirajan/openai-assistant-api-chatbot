@@ -17,6 +17,7 @@ from .config import ConfigError, Settings
 from .extensions import db
 from .knowledge import KnowledgeError, create_knowledge_base
 from .models import ChatMessage, ChatThread, User
+from .persona import one_line
 from .shopify import ShopifyCatalog, ShopifyError, catalogue_markdown
 
 
@@ -69,7 +70,7 @@ def _replacements() -> int:
     by_month: collections.Counter[str] = collections.Counter()
     for created, username, order_id, text in rows:
         by_month[created.strftime("%Y-%m")] += 1
-        snippet = " ".join(text.split())[:60]
+        snippet = one_line(text, 60)  # also cleaned when stored; a database edited by hand is not trusted
         print(f"{created:%Y-%m-%d %H:%M}  {username}  order {order_id or '-'}  {snippet}")
     print("By month: " + ", ".join(f"{month}: {n}" for month, n in sorted(by_month.items())))
     return 0

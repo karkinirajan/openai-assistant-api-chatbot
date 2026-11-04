@@ -44,13 +44,18 @@ def local_now(timezone: str) -> datetime:
     return datetime.now(ZoneInfo(timezone))
 
 
-def clean_name(name: str) -> str:
-    """A customer's name as it may appear in a prompt: no control or format characters, one line, bounded."""
+def one_line(text: str, limit: int) -> str:
+    """`text` on one line, with no control or format characters (it cannot drive a terminal), cut short."""
     # whitespace first: a newline is a control character too, and must become a space, not vanish
     kept = "".join(
-        " " if c.isspace() else c for c in name if c.isspace() or not unicodedata.category(c).startswith("C")
+        " " if c.isspace() else c for c in text if c.isspace() or not unicodedata.category(c).startswith("C")
     )
-    return re.sub(r" {2,}", " ", kept).strip()[:MAX_NAME_CHARS]
+    return re.sub(r" {2,}", " ", kept).strip()[:limit]
+
+
+def clean_name(name: str) -> str:
+    """A customer's name as it may appear in a prompt: no control or format characters, one line, bounded."""
+    return one_line(name, MAX_NAME_CHARS)
 
 
 def instructions(customer: str, now: datetime) -> str:
